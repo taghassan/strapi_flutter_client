@@ -501,7 +501,7 @@ class ErrorResponse {
   final int status;
   final String name;
   final String message;
-  final String? details;
+  final dynamic? details;
 
   ErrorResponse({
     required this.status,
