@@ -505,7 +505,7 @@ class StrapiResponse {
   final bool failed;
 
   ///short error message
-  final String error;
+  final dynamic error;
 
   ///error message
   final String errorMessage;
