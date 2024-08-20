@@ -426,7 +426,7 @@ class Strapi {
         return StrapiResponse(
             statusCode: response.statusCode,
             body: [if (!failed) responseJson],
-            error: responseJson["error"] ?? "",
+            error: responseJson["error"] ?? null,
             errorMessage: failed ? responseJson.toString() : "",
             failed: failed,
             count: failed ? 0 : 1,
