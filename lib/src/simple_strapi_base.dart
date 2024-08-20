@@ -1,10 +1,9 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
+import "dart:async";
+import "dart:convert";
+import "dart:io";
 
-import 'package:simple_strapi/simple_strapi.dart';
 
-part 'simple_strapi_graph_query.dart';
+part "simple_strapi_graph_query.dart";
 
 ///Exception thrown when you call [Strapi.i.request]
 class StrapiResponseException extends StrapiException {
@@ -303,12 +302,13 @@ class Strapi {
   ///throws [StrapiResponseException] if request is failed
   Future<StrapiResponse> graphRequest(String queryString,
       {int maxTimeOutInMillis = 15000}) async {
+    print(queryString.toString());
     if (verbose) {
       sPrint("strapi query string: \n$queryString");
     }
     final response = await request(
       "/graphql",
-      method: "POST",
+      method: "GET",
       body: {"query": "{$queryString}"},
       maxTimeOutInMillis: maxTimeOutInMillis,
     );
@@ -426,8 +426,8 @@ class Strapi {
         return StrapiResponse(
             statusCode: response.statusCode,
             body: [if (!failed) responseJson],
-            error: responseJson["error"] ?? null,
-            errorBody: ErrorResponse.fromJson(responseJson["error"])
+            error: responseJson["error"],
+            errorBody:responseJson["error"]!=null? ErrorResponse.fromJson(responseJson["error"]): null,
             errorMessage: failed ? responseJson.toString() : "",
             failed: failed,
             count: failed ? 0 : 1,
@@ -501,7 +501,7 @@ class ErrorResponse {
   final int status;
   final String name;
   final String message;
-  final dynamic? details;
+  final dynamic details;
 
   ErrorResponse({
     required this.status,
@@ -512,19 +512,19 @@ class ErrorResponse {
 
   factory ErrorResponse.fromJson(Map<String, dynamic> json) {
     return ErrorResponse(
-      status: json['status'] as int,
-      name: json['name'] as String,
-      message: json['message'] as String,
-      details: json['details'] as String?,
+      status: json["status"] as int,
+      name: json["name"] as String,
+      message: json["message"] as String,
+      details: json["details"],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'status': status,
-      'name': name,
-      'message': message,
-      'details': details,
+      "status": status,
+      "name": name,
+      "message": message,
+      "details": details,
     };
   }
 }
@@ -684,6 +684,7 @@ class StrapiUtils {
             "ignoring a error while parsing a strapi object, set verbose to true to see the error");
       }
     }
+    return null;
   }
 }
 
@@ -747,23 +748,21 @@ class StrapiObjectListener {
   static void _inform(
     List<Map<String, dynamic>> list,
   ) {
-    if (list is List) {
-      list.forEach((data) {
-        final id = data["id"];
-        if (id is String) {
-          final allListenerForId = _allListeners[id];
-          if (allListenerForId is List) {
-            allListenerForId?.forEach(
-              (l) {
-                l._lastData = data;
-                l._executeListener();
-              },
-            );
-          }
+    list.forEach((data) {
+      final id = data["id"];
+      if (id is String) {
+        final allListenerForId = _allListeners[id];
+        if (allListenerForId is List) {
+          allListenerForId?.forEach(
+            (l) {
+              l._lastData = data;
+              l._executeListener();
+            },
+          );
         }
-      });
+      }
+    });
     }
-  }
 
   ///listen to a Strapi collection object, listening for now means any new instance of the collection
   ///object with [id] is received will be delivered to the [listner], no server changes are are streamed as
