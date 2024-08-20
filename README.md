@@ -5,6 +5,15 @@ A Strapi library for Dart developers. with which you can make basic find, findOn
 
 # Usage
 
+```
+
+simple_strapi:
+    git:
+      url: https://github.com/taghassan/strapi_flutter_client.git
+      ref: main # branch name
+
+```
+
 ## Configure.
 
 ```dart
