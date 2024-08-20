@@ -427,6 +427,7 @@ class Strapi {
             statusCode: response.statusCode,
             body: [if (!failed) responseJson],
             error: responseJson["error"] ?? null,
+            errorBody: ErrorResponse.fromJson(responseJson["error"])
             errorMessage: failed ? responseJson.toString() : "",
             failed: failed,
             count: failed ? 0 : 1,
@@ -496,6 +497,39 @@ class Strapi {
   }
 }
 
+class ErrorResponse {
+  final int status;
+  final String name;
+  final String message;
+  final String? details;
+
+  ErrorResponse({
+    required this.status,
+    required this.name,
+    required this.message,
+    this.details,
+  });
+
+  factory ErrorResponse.fromJson(Map<String, dynamic> json) {
+    return ErrorResponse(
+      status: json['status'] as int,
+      name: json['name'] as String,
+      message: json['message'] as String,
+      details: json['details'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'name': name,
+      'message': message,
+      'details': details,
+    };
+  }
+}
+
+
 ///callng [Strapi.i.request] will return this
 class StrapiResponse {
   ///http response code for the rquest made
@@ -506,6 +540,9 @@ class StrapiResponse {
 
   ///short error message
   final dynamic error;
+
+    ///short error message
+  final ErrorResponse? errorBody;
 
   ///error message
   final String errorMessage;
@@ -520,11 +557,13 @@ class StrapiResponse {
   ///url the request is made against
   final Uri? url;
 
+
   ///object that is returned when you call [Strapi.i.request]
   StrapiResponse(
       {required this.statusCode,
       required this.failed,
       required this.error,
+      this.errorBody,
       required this.errorMessage,
       required this.body,
       required this.count,
